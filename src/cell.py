@@ -10,6 +10,7 @@ class Cell():
         self._y1 = coord1[1]
         self._x2 = coord2[0]
         self._y2 = coord2[1]
+        self._center = Point( (self._x1 + self._x2) / 2, (self._y1 + self._y2) / 2)
         self.top_wall = True
         self.bottom_wall = True
         self.left_wall = True
@@ -42,3 +43,8 @@ class Cell():
         line: Line
         for line in lines:
             line.draw(self._canvas, "black")
+    
+    def draw_move(self, other_cell: "Cell", undo=False):
+        line = Line( self._center, other_cell._center )
+        color = "red" if not undo else "gray"
+        line.draw( self._canvas, fill_color=color)

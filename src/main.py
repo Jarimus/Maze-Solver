@@ -7,42 +7,24 @@ def main():
     #open window
     win = Window(800, 600)
 
-    #draw a few cells
-    which_walls = []
-    for i in range(16):
-        binary = bin(i)[2:][::-1]
-        binary = "0" * (4 - len(binary)) + binary[::-1]
-        which_walls.append( binary )
+    #draw a cells and moves between them
+    cell1 = Cell( (100, 100), (200, 200), win._canvas )
+    cell1.right_wall = False
+
+    cell2 = Cell( (200,100), (300,200), win._canvas )
+    cell2.left_wall = False
+    cell2.bottom_wall = False
+
+    cell3 = Cell( (200,200), (300,300), win._canvas )
+    cell3.top_wall = False
+
+    cell1.draw()
+    cell2.draw()
+    cell3.draw()
+
+    cell1.draw_move(cell2)
+    cell2.draw_move(cell3, undo=True)
     
-    for i, permutation in enumerate(which_walls):
-        if i % 2 == 0:
-            cell = Cell( (20 * (i + 1), 10), (20 * (i + 2), 30), win._canvas)
-            
-            if permutation[0] == "0":
-                cell.top_wall = False
-            if permutation[1] == "0":
-                cell.bottom_wall = False
-            if permutation[2] == "0":
-                cell.left_wall = False
-            if permutation[3] == "0":
-                cell.right_wall = False
-
-            cell.draw()
-            
-        else:
-            cell = Cell( (10, 20 * (i + 1) ), (30, 20 * (i + 2) ), win._canvas)
-            walls = [cell.top_wall, cell.bottom_wall, cell.right_wall, cell.left_wall]
-            
-            if permutation[0] == "0":
-                cell.top_wall = False
-            if permutation[1] == "0":
-                cell.bottom_wall = False
-            if permutation[2] == "0":
-                cell.left_wall = False
-            if permutation[3] == "0":
-                cell.right_wall = False
-
-            cell.draw()
 
 
 
