@@ -5,16 +5,18 @@ class Window():
 
     def __init__(self, width, height):
         # Window size
-        self.__width = width
-        self.__height = height
+        self.__width = str(width)
+        self.__height = str(height)
         
         # Tk widget
         self.__tk = Tk()
+        self.__tk.geometry(self.__width + "x" + self.__height + "+" + "100" + "+" + "100")
         self.__tk.title = "Maze Solver"
 
         # canvas
-        self.__canvas = Canvas()
-        self.__canvas.pack()
+        self._canvas = Canvas()
+        self._canvas.config( width=self.__width, height=self.__height)
+        self._canvas.pack()
 
         # window running?
         self.__running = False
@@ -37,4 +39,4 @@ class Window():
         self.__running = False
     
     def draw_line(self, line: Line, fill_color: str):
-        line.draw(self.__canvas, fill_color)
+        line.draw(self._canvas, fill_color)
