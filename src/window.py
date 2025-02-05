@@ -15,7 +15,7 @@ class Window():
 
         # canvas
         self._canvas = Canvas()
-        self._canvas.config( width=self.__width, height=self.__height)
+        self._canvas.config( width=self.__width, height=self.__height, bg="#d9d9d9")
         self._canvas.pack()
 
         # window running?

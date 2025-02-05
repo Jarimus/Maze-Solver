@@ -36,18 +36,29 @@ class Cell():
         bottom_right = Point(self._x2, self._y2)
 
         lines = []
+        passage = []
         if self.top_wall:
             lines.append( Line(top_left, top_right) )
+        else:
+            passage.append( Line(top_left, top_right) )
         if self.right_wall:
             lines.append( Line(top_right, bottom_right) )
+        else:
+            passage.append( Line(top_right, bottom_right) )
         if self.bottom_wall:
             lines.append( Line(bottom_left, bottom_right) )
+        else:
+            passage.append( Line(bottom_left, bottom_right) )
         if self.left_wall:
             lines.append( Line(top_left, bottom_left) )
+        else:
+            passage.append( Line(top_left, bottom_left) )
 
         line: Line
         for line in lines:
             self.win.draw_line(line, "black")
+        for line in passage:
+            self.win.draw_line(line, "#d9d9d9")
     
     def draw_move(self, other_cell: "Cell", undo=False):
         center_self = Point( (self._x1 + self._x2) / 2, (self._y1 + self._y2) / 2)
