@@ -1,28 +1,33 @@
 from point import Point
 from line import Line
+from window import Window
 
 class Cell():
     """A class for the individual cells in the maze"""
 
-    def __init__(self, coord1: tuple[int, int], coord2: tuple[int, int], canvas):
-        """Creates a Cell instance with coordinates for the top-left and bottom-right corners and the canvas for drawing."""
-        self._x1 = coord1[0]
-        self._y1 = coord1[1]
-        self._x2 = coord2[0]
-        self._y2 = coord2[1]
-        self._center = Point( (self._x1 + self._x2) / 2, (self._y1 + self._y2) / 2)
+    def __init__(self, win: Window):
+        """Creates a Cell instance without any coordinates. Coordinates are set when the cell is drawn."""
+        self._x1 = None
+        self._y1 = None
+        self._x2 = None
+        self._y2 = None
         self.top_wall = True
         self.bottom_wall = True
         self.left_wall = True
         self.right_wall = True
-        self._canvas = canvas
+        self.win = win
     
-    def draw(self):
-        """Draws the cell on the canvas.
+    def draw(self, x1, y1, x2, y2):
+        """Draws the cell on the canvas. Also updates the coordinates of the cell.
         x1y1 --- x2y1
         |        |
         |        |
         x1y2 --- x2y2"""
+
+        self._x1 = x1
+        self._x2 = x2
+        self._y1 = y1
+        self._y2 = y2
 
         #Draw walls as Lines
         top_left = Point(self._x1, self._y1)
@@ -42,9 +47,11 @@ class Cell():
 
         line: Line
         for line in lines:
-            line.draw(self._canvas, "black")
+            self.win.draw_line(line, "black")
     
     def draw_move(self, other_cell: "Cell", undo=False):
-        line = Line( self._center, other_cell._center )
+        center_self = Point( (self._x1 + self._x2) / 2, (self._y1 + self._y2) / 2)
+        center_other = Point( (other_cell._x1 + other_cell._x2) / 2, (other_cell._y1 + other_cell._y2) / 2)
+        line = Line( center_self, center_other )
         color = "red" if not undo else "gray"
-        line.draw( self._canvas, fill_color=color)
+        self.win.draw_line( line, fill_color=color)
