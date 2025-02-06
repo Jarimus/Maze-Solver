@@ -1,21 +1,29 @@
 from tkinter import Tk, BOTH, Canvas
 from line import Line
+from constants import BACKGROUND_COLOR, MAZE_TOP_X, MAZE_TOP_Y, MAZE_COLS, MAZE_ROWS, CELL_SIZE
 
 class Window():
 
     def __init__(self, width, height):
+        self.__tk = Tk()
+
+
         # Window size
+        if width == 0 and height == 0:
+            width, height = self.__tk.winfo_screenwidth() - 10, self.__tk.winfo_screenheight() - 10
         self.__width = str(width)
         self.__height = str(height)
         
         # Tk widget
-        self.__tk = Tk()
-        self.__tk.geometry(self.__width + "x" + self.__height + "+" + "100" + "+" + "100")
+        self.__tk.geometry(self.__width + "x" + self.__height + "+0+0")
         self.__tk.title = "Maze Solver"
+
 
         # canvas
         self._canvas = Canvas()
-        self._canvas.config( width=self.__width, height=self.__height, bg="#d9d9d9")
+        canvas_width = MAZE_TOP_X * 2 + CELL_SIZE * MAZE_COLS
+        canvas_height = MAZE_TOP_Y * 2 + CELL_SIZE * MAZE_ROWS
+        self._canvas.config( width=canvas_width, height=canvas_height, bg=BACKGROUND_COLOR)
         self._canvas.pack()
 
         # window running?

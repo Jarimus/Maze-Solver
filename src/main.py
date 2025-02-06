@@ -1,17 +1,17 @@
 from window import Window
 from maze import Maze
+from constants import MAZE_TOP_X, MAZE_TOP_Y, MAZE_COLS, MAZE_ROWS, CELL_SIZE, RANDOM_SEED, SCREEN_WIDTH, SCREEN_HEIGHT
 
 def main():
-    #open window
-    win = Window(800, 600)
-
-    #draw the maze: topleft corner coords, num of cols and rows, cell size, window
-    Maze(200, 50, 10, 10, 40, win)
+    #open window either full screen size or custom size
+    
+    win = Window(SCREEN_WIDTH, SCREEN_HEIGHT)
+    
+    #draw the maze
+    Maze(MAZE_TOP_X, MAZE_TOP_Y, MAZE_ROWS, MAZE_COLS, CELL_SIZE, win, RANDOM_SEED)
 
     #wait for close
     win.wait_for_close()
-
-
 
 if __name__ == '__main__':
     main()

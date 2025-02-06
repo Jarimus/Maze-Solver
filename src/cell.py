@@ -1,6 +1,7 @@
 from point import Point
 from line import Line
 from window import Window
+from constants import WALL_COLOR, BACKGROUND_COLOR, CORRECT_PATH_COLOR, WRONG_PATH_COLOR
 
 class Cell():
     """A class for the individual cells in the maze"""
@@ -57,13 +58,13 @@ class Cell():
 
         line: Line
         for line in lines:
-            self.win.draw_line(line, "black")
+            self.win.draw_line(line, WALL_COLOR)
         for line in passage:
-            self.win.draw_line(line, "#d9d9d9")
+            self.win.draw_line(line, BACKGROUND_COLOR)
     
     def draw_move(self, other_cell: "Cell", undo=False):
         center_self = Point( (self._x1 + self._x2) / 2, (self._y1 + self._y2) / 2)
         center_other = Point( (other_cell._x1 + other_cell._x2) / 2, (other_cell._y1 + other_cell._y2) / 2)
         line = Line( center_self, center_other )
-        color = "red" if not undo else "gray"
+        color = CORRECT_PATH_COLOR if not undo else WRONG_PATH_COLOR
         self.win.draw_line( line, fill_color=color)
