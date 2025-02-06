@@ -1,6 +1,5 @@
 from cell import Cell
 from time import sleep
-from window import Window
 from random import seed, randint
 from constants import MAZE_GENERATION_SPEED, CELL_SIZE, CORRECT_PATH_COLOR, WRONG_PATH_COLOR, MAZE_SOLVE_SPEED
 from line import Line
@@ -15,7 +14,7 @@ class Maze():
         num_rows: int,
         num_cols: int,
         cell_size,
-        win: Window=None,
+        win =None,
         set_seed: int=None,
     ):
         self._cells = []
@@ -176,12 +175,10 @@ class Maze():
         return self._solve_r(0, 0)
 
     def _solve_r(self, i: int, j: int):
-        self._animate("solve")
         current_cell = self._cells[i][j]
         current_cell.visited = True
 
         if i == self.num_cols - 1 and j == self.num_rows - 1:
-            print("Exit found!")
             return True
         
         next_cells = [ (i,j+1), (i,j-1), (i-1,j), (i+1,j) ]
@@ -203,12 +200,13 @@ class Maze():
                 if m == j + 1 and current_cell.bottom_wall == False:
                     path = True
                 if path:
+                    self._animate("solve")
                     self._draw_line(i, j, n, m)
                     correct_path = self._solve_r(n, m)
                     if correct_path:
                         return True
                     if not correct_path:
+                        self._animate("solve")
                         self._draw_line(i, j, n, m, undo=True)
         
         return False
-        

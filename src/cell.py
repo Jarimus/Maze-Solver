@@ -1,12 +1,11 @@
 from point import Point
 from line import Line
-from window import Window
 from constants import WALL_COLOR, BACKGROUND_COLOR, CORRECT_PATH_COLOR, WRONG_PATH_COLOR
 
 class Cell():
     """A class for the individual cells in the maze"""
 
-    def __init__(self, win: Window):
+    def __init__(self, win):
         """Creates a Cell instance without any coordinates. Coordinates are set when the cell is drawn."""
         self._x1 = None
         self._y1 = None
