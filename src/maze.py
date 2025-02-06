@@ -25,7 +25,19 @@ class Maze():
         self._win = win
         self.seed = None if seed is None else seed(set_seed)
 
+        # Create the maze
         self._create_cells()
+
+        # break entrance and exit
+        self._break_entrance_and_exit()
+
+        # Create paths
+        self._break_walls_r(0,0)
+
+        # Reset visited status
+        self._reset_visited_cells()
+
+
     
     def _create_cells(self):
         """Fills a list with lists of cells. Top-level lists are the rows in the maze.
@@ -39,12 +51,6 @@ class Maze():
         for i in range(self.num_cols):
             for j in range(self.num_rows):
                 self._draw_cell(i, j)
-        
-        #break entrance and exit
-        self._break_entrance_and_exit()
-
-        #Create paths
-        self._break_walls_r(0,0)
     
     def _break_entrance_and_exit(self):
         self._cells: list[list[Cell]]
@@ -128,3 +134,9 @@ class Maze():
             return
         self._win.redraw()
         sleep(MAZE_GENERATION_SPEED)
+    
+    def _reset_visited_cells(self):
+        cell: Cell
+        for row in self._cells:
+            for cell in row:
+                cell.visited = False
