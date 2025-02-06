@@ -16,6 +16,7 @@ class Cell():
         self.left_wall = True
         self.right_wall = True
         self.win = win
+        self.visited = False
     
     def draw(self, x1, y1, x2, y2):
         """Draws the cell on the canvas. Also updates the coordinates of the cell.

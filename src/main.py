@@ -1,5 +1,6 @@
 from window import Window
 from maze import Maze
+
 def main():
     #open window
     win = Window(800, 600)

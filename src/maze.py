@@ -1,6 +1,7 @@
 from cell import Cell
 from time import sleep
 from window import Window
+from random import seed
 
 class Maze():
 
@@ -12,6 +13,7 @@ class Maze():
         num_cols: int,
         cell_size,
         win: Window=None,
+        set_seed: int=None,
     ):
         self._cells = []
         self.x1 = x1
@@ -20,6 +22,7 @@ class Maze():
         self.num_cols = num_cols
         self.cell_size = cell_size
         self._win = win
+        self.seed = None if seed is None else seed(set_seed)
 
         self._create_cells()
     
@@ -51,6 +54,10 @@ class Maze():
         exit = self._cells[self.num_cols - 1][self.num_rows - 1]
         exit.bottom_wall = False
         self._draw_cell(self.num_cols - 1, self.num_rows - 1)
+    
+    def break_walls_r(self, i: int, j: int):
+        """Depth first recursion to break walls when initializing the maze."""
+        pass
 
     def _draw_cell(self, i:int, j:int):
         if self._win is None:
@@ -67,8 +74,6 @@ class Maze():
 
         #animate the maze
         self._animate()
-    
-
     
     def _animate(self):
         if self._win is None:
