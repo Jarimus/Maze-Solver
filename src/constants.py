@@ -10,7 +10,8 @@ MAZE_TOP_X = 25
 MAZE_TOP_Y = 25
 MAZE_COLS = 12
 MAZE_ROWS = 7
-MAZE_GENERATION_SPEED = 0.03
+MAZE_GENERATION_SPEED = 0.025 # The delay between each draw in seconds
+MAZE_SOLVE_SPEED = 0.1 # The delay between each line draw in seconds
 RANDOM_SEED = None
 
 # Line constants

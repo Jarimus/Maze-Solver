@@ -2,7 +2,9 @@ from cell import Cell
 from time import sleep
 from window import Window
 from random import seed, randint
-from constants import MAZE_GENERATION_SPEED
+from constants import MAZE_GENERATION_SPEED, CELL_SIZE, CORRECT_PATH_COLOR, WRONG_PATH_COLOR, MAZE_SOLVE_SPEED
+from line import Line
+from point import Point
 
 class Maze():
 
@@ -36,6 +38,9 @@ class Maze():
 
         # Reset visited status
         self._reset_visited_cells()
+
+        # Solve the maze
+        self.solve()
 
 
     
@@ -112,11 +117,21 @@ class Maze():
                 self._break_walls_r(n, m)
         
 
-
-    def _draw_cell(self, i:int, j:int):
+    def _animate(self, mode="draw"):
         if self._win is None:
             return
+        self._win.redraw()
+
+        if mode == "solve":
+            sleep(MAZE_SOLVE_SPEED)
+        else:
+            sleep(MAZE_GENERATION_SPEED)
+
+
+    def _draw_cell(self, i:int, j:int):
         """Draws a cell according to its place in the self._cells list of lists."""
+        if self._win is None:
+            return
         #calculate Cell's position
         x1 = self.x1 + i * self.cell_size
         y1 = self.y1 + j * self.cell_size
@@ -129,14 +144,71 @@ class Maze():
         #animate the maze
         self._animate()
     
-    def _animate(self):
+
+    def _draw_line(self, i: int, j: int, n: int, m: int, undo=False):
         if self._win is None:
             return
-        self._win.redraw()
-        sleep(MAZE_GENERATION_SPEED)
+        
+        if undo:
+            fill_color = WRONG_PATH_COLOR
+        else:
+            fill_color = CORRECT_PATH_COLOR
+
+        current_cell = self._cells[i][j]
+        other_cell = self._cells[n][m]
+
+        x1 = current_cell._x1 + CELL_SIZE / 2
+        y1 = current_cell._y1 + CELL_SIZE / 2
+        x2 = other_cell._x1 + CELL_SIZE / 2
+        y2 = other_cell._y1 + CELL_SIZE / 2
+
+        new_line = Line( Point(x1, y1), Point(x2, y2) )
+        self._win.draw_line( new_line, fill_color)
+
     
     def _reset_visited_cells(self):
         cell: Cell
         for row in self._cells:
             for cell in row:
                 cell.visited = False
+    
+    def solve(self):
+        return self._solve_r(0, 0)
+
+    def _solve_r(self, i: int, j: int):
+        self._animate("solve")
+        current_cell = self._cells[i][j]
+        current_cell.visited = True
+
+        if i == self.num_cols - 1 and j == self.num_rows - 1:
+            print("Exit found!")
+            return True
+        
+        next_cells = [ (i,j+1), (i,j-1), (i-1,j), (i+1,j) ]
+
+        while next_cells != []:
+
+            n, m = next_cells.pop( randint(0, len(next_cells) - 1) )
+
+            if not (0 <= n < self.num_cols and 0 <= m < self.num_rows):
+                continue
+            if not self._cells[n][m].visited:
+                path = False
+                if n == i - 1 and current_cell.left_wall == False:
+                    path = True
+                if n == i + 1 and current_cell.right_wall == False:
+                    path = True
+                if m == j - 1 and current_cell.top_wall == False:
+                    path = True
+                if m == j + 1 and current_cell.bottom_wall == False:
+                    path = True
+                if path:
+                    self._draw_line(i, j, n, m)
+                    correct_path = self._solve_r(n, m)
+                    if correct_path:
+                        return True
+                    if not correct_path:
+                        self._draw_line(i, j, n, m, undo=True)
+        
+        return False
+        
