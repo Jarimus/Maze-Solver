@@ -1,5 +1,5 @@
 from point import Point
-from constants import LINE_THICKNESS
+from constants import WALL_LINE_THICKNESS, PATH_LINE_THICKNESS, CORRECT_PATH_COLOR, WRONG_PATH_COLOR, WALL_COLOR, BACKGROUND_COLOR
 from tkinter import Canvas
 
 class Line():
@@ -11,4 +11,7 @@ class Line():
     
     def draw(self, canvas: Canvas, fill_color: str):
         """Draws a line from point1 to point2 on the canvas."""
-        canvas.create_line(self.point1.x, self.point1.y, self.point2.x, self.point2.y, fill=fill_color, width=LINE_THICKNESS)
+        if fill_color in [WALL_COLOR, BACKGROUND_COLOR]:
+            canvas.create_line(self.point1.x, self.point1.y, self.point2.x, self.point2.y, fill=fill_color, width=WALL_LINE_THICKNESS)
+        elif fill_color in [CORRECT_PATH_COLOR, WRONG_PATH_COLOR]:
+            canvas.create_line(self.point1.x, self.point1.y, self.point2.x, self.point2.y, fill=fill_color, width=PATH_LINE_THICKNESS)

@@ -38,10 +38,6 @@ class Maze():
         # Reset visited status
         self._reset_visited_cells()
 
-        # Solve the maze
-        self.solve()
-
-
     
     def _create_cells(self):
         """Fills a list with lists of cells. Top-level lists are the rows in the maze.
