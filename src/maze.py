@@ -1,7 +1,7 @@
 from cell import Cell
 from time import sleep
 from random import seed, randint
-from constants import MAZE_GENERATION_SPEED, CELL_SIZE, CORRECT_PATH_COLOR, WRONG_PATH_COLOR, MAZE_SOLVE_SPEED
+from constants import MAZE_GENERATION_SPEED, CORRECT_PATH_COLOR, WRONG_PATH_COLOR, MAZE_SOLVE_SPEED
 from line import Line
 from point import Point
 
@@ -152,10 +152,10 @@ class Maze():
         current_cell = self._cells[i][j]
         other_cell = self._cells[n][m]
 
-        x1 = current_cell._x1 + CELL_SIZE / 2
-        y1 = current_cell._y1 + CELL_SIZE / 2
-        x2 = other_cell._x1 + CELL_SIZE / 2
-        y2 = other_cell._y1 + CELL_SIZE / 2
+        x1 = current_cell._x1 + self.cell_size / 2
+        y1 = current_cell._y1 + self.cell_size / 2
+        x2 = other_cell._x1 + self.cell_size / 2
+        y2 = other_cell._y1 + self.cell_size / 2
 
         new_line = Line( Point(x1, y1), Point(x2, y2) )
         self._win.draw_line( new_line, fill_color)
