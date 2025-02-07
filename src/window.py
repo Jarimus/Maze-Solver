@@ -8,26 +8,37 @@ class Window():
 
     def __init__(self, width, height):
         self.__tk = Tk()
+        self.maze_x = MAZE_TOP_X
+        self.maze_y = MAZE_TOP_Y
 
         # Font
         self.button_font = font.Font(size=28)
 
         # Window size
         if width == 0 and height == 0:
-            width, height = self.__tk.winfo_screenwidth() - 10, self.__tk.winfo_screenheight() - 10
-        self.__width = str(width)
-        self.__height = str(height)
+            new_width, new_height = self.__tk.winfo_screenwidth() - 10, self.__tk.winfo_screenheight() - 10
+            self.__width = str(new_width)
+            self.__height = str(new_height)
+        else:
+            self.__width = str(width)
+            self.__height = str(height)
         
         # Tk widget
+        self.__tk.configure(background=BACKGROUND_COLOR)
         self.__tk.geometry(self.__width + "x" + self.__height + "+0+0")
         self.__tk.title = "Maze Solver"
 
         # canvas
         self._canvas = Canvas()
-        canvas_width = MAZE_TOP_X * 2 + CELL_SIZE * MAZE_COLS
-        canvas_height = MAZE_TOP_Y * 2 + CELL_SIZE * MAZE_ROWS
+        canvas_width = self.maze_x * 2 + CELL_SIZE * MAZE_COLS if width != 0 else new_width
+        canvas_height = self.maze_y * 2 + CELL_SIZE * MAZE_ROWS if height != 0 else new_height - 200
         self._canvas.config( width=canvas_width, height=canvas_height, bg=BACKGROUND_COLOR)
         self._canvas.grid( column=0, columnspan=2,row=0 )
+
+        # Adjust maze to the center of the canvas when in full screen
+        if width == 0 and height == 0:
+            self.maze_x = (new_width - (CELL_SIZE * MAZE_COLS)) // 2
+            self.maze_y = ((new_height - 200) - (CELL_SIZE * MAZE_ROWS)) // 2
 
         # 'Create Maze' button
         self.create_maze_btn = Button(self.__tk, text="Create a maze", command=self.start_maze, font=self.button_font)
@@ -67,7 +78,7 @@ class Window():
         # Clear canvas
         self._canvas.delete("all")
         # Initiate the maze
-        self.maze = Maze(MAZE_TOP_X, MAZE_TOP_Y, MAZE_ROWS, MAZE_COLS, CELL_SIZE, self, RANDOM_SEED)
+        self.maze = Maze(self.maze_x, self.maze_y, MAZE_ROWS, MAZE_COLS, CELL_SIZE, self, RANDOM_SEED)
         # Reactivate the button, activate solve button
         self.create_maze_btn["state"] = "normal"
         self.solve_maze_btn["state"] = "normal"
