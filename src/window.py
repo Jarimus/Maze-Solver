@@ -1,6 +1,6 @@
-from tkinter import Tk, Button, Canvas, font
+from tkinter import Tk, Button, Canvas, font, Entry, Label
 from line import Line
-from constants import BACKGROUND_COLOR, MAZE_V_PADDING, MAZE_H_PADDING, MAZE_COLS, MAZE_ROWS, CELL_SIZE, RANDOM_SEED
+from constants import BACKGROUND_COLOR, MAZE_V_PADDING, MAZE_H_PADDING, MAZE_COLS, MAZE_ROWS, CELL_SIZE, RANDOM_SEED, SPACE_FOR_UI, ELEMENT_PADDING
 from maze import Maze
 
 
@@ -8,6 +8,7 @@ class Window():
 
     def __init__(self, width, height):
         self.__tk = Tk()
+        self._canvas = None
 
         # Customizable cell size from the constant value
         self.cell_size = CELL_SIZE
@@ -29,34 +30,28 @@ class Window():
         self.__tk.geometry(str(self.__width) + "x" + str(self.__height) + "+0+0")
         self.__tk.title = "Maze Solver"
 
-        # canvas
-        self._canvas = Canvas()
-
-        # If CELL_SIZE is set, the canvas' size is calculated accordingly to minimize empty space
-        if self.cell_size != 0:
-            canvas_width = self.maze_x * 2 + self.cell_size * MAZE_COLS if width != 0 else new_width
-            canvas_height = self.maze_y * 2 + self.cell_size * MAZE_ROWS if height != 0 else new_height - 200
-
-        # If CELL_SIZE == 0, the canvas' size is calculated to fill the screen with a CELL_SIZE that fills the canvas.
-        elif self.cell_size == 0:
-            canvas_width, canvas_height = self.__width, self.__height - 200
-            self.cell_size = min( (canvas_width - MAZE_H_PADDING) // MAZE_COLS, (canvas_height - MAZE_V_PADDING) // MAZE_ROWS )
-        
-        self._canvas.config( width=canvas_width, height=canvas_height, bg=BACKGROUND_COLOR)
-        self._canvas.grid( column=0, columnspan=2,row=0 )
-
-        # Adjust maze to the center of the canvas when in full screen
-        self.maze_x = (new_width - (self.cell_size * MAZE_COLS)) // 2
-        self.maze_y = ((new_height - 200) - (self.cell_size * MAZE_ROWS)) // 2
-
         # 'Create Maze' button
         self.create_maze_btn = Button(self.__tk, text="Create a maze", command=self.start_maze, font=self.button_font)
-        self.create_maze_btn.grid( column=0, row=1 )
+        self.create_maze_btn.grid( column=0, row=0, columnspan=2, pady=ELEMENT_PADDING )
         
 
         # 'Solve Maze' button
         self.solve_maze_btn = Button(self.__tk, text="Solve the maze", state="disabled", command=self.solve_maze, font=self.button_font)
-        self.solve_maze_btn.grid( column=1, row=1 )
+        self.solve_maze_btn.grid( column=2, row=0, columnspan=2, pady=ELEMENT_PADDING )
+
+        # Labels and Entries for rows and columns
+        self.rows_label = Label(self.__tk, text=f"Rows (max {MAZE_ROWS}):", font=self.button_font)
+        self.rows_label.grid(column=0, row=1, pady=ELEMENT_PADDING)
+        self.rows_entry = Entry(self.__tk, font=self.button_font)
+        self.rows_entry.grid(column=1, row=1, pady=ELEMENT_PADDING)
+
+        self.cols_label = Label(self.__tk, text=f"Columns(max {MAZE_COLS}):", font=self.button_font)
+        self.cols_label.grid(column=2, row=1, pady=ELEMENT_PADDING)
+        self.cols_entry = Entry(self.__tk, font=self.button_font)
+        self.cols_entry.grid(column=3, row=1, pady=ELEMENT_PADDING)
+
+        # Create canvas
+        self.create_canvas()
 
         # window running?
         self.__running = False        
@@ -71,7 +66,6 @@ class Window():
     def wait_for_close(self):
 
         self.__running = True
-
         while self.__running:
             self.redraw()
     
@@ -82,12 +76,17 @@ class Window():
         line.draw(self._canvas, fill_color)
 
     def start_maze(self):
-        # disable the create button
+        self.create_canvas()
+
+        # disable the buttons
+        self.solve_maze_btn["state"] = "disabled"
         self.create_maze_btn["state"] = "disabled"
         # Clear canvas
         self._canvas.delete("all")
+
+
         # Initiate the maze
-        self.maze = Maze(self.maze_x, self.maze_y, MAZE_ROWS, MAZE_COLS, self.cell_size, self, RANDOM_SEED)
+        self.maze = Maze(self.maze_x, self.maze_y, self.rows, self.cols, self.cell_size, self, RANDOM_SEED)
         # Reactivate the button, activate solve button
         self.create_maze_btn["state"] = "normal"
         self.solve_maze_btn["state"] = "normal"
@@ -95,4 +94,36 @@ class Window():
     
     def solve_maze(self):
         self.solve_maze_btn["state"] = "disabled"
+        self.create_maze_btn["state"] = "disabled"
         self.maze.solve()
+        self.create_maze_btn["state"] = "normal"
+
+    def create_canvas(self):
+        # canvas
+        if self._canvas:
+            self._canvas.delete()
+        self._canvas = Canvas()
+
+        #Get dimensions for the canvas
+        canvas_width = self.__width
+        canvas_height = self.__height - SPACE_FOR_UI
+
+        # Get rows and columns from entries
+        try:
+            self.rows = min(MAZE_ROWS, int(self.rows_entry.get()) )
+            self.cols = min(MAZE_COLS, int(self.cols_entry.get()) )
+        except ValueError:
+            self.rows = MAZE_ROWS
+            self.cols = MAZE_COLS
+
+        #Apply UI
+        self._canvas.config( width=canvas_width, height=canvas_height, bg=BACKGROUND_COLOR)
+        self._canvas.grid( column=0, columnspan=4,row=2 )
+
+        # If CELL_SIZE == 0, the canvas' size is calculated to fill the screen with a CELL_SIZE that fills the canvas.
+        #if self.cell_size == 0:
+        self.cell_size = min( (canvas_width - MAZE_H_PADDING) // self.cols, (canvas_height - MAZE_V_PADDING) // self.rows )
+
+        # Adjust maze to the center of the canvas
+        self.maze_x = (self.__width - (self.cell_size * self.cols)) // 2
+        self.maze_y = ((self.__height - SPACE_FOR_UI) - (self.cell_size * self.rows)) // 2

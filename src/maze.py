@@ -9,8 +9,8 @@ class Maze():
 
     def __init__(
         self,
-        x1: int,
-        y1: int,
+        maze_x: int,
+        maze_y: int,
         num_rows: int,
         num_cols: int,
         cell_size,
@@ -18,8 +18,8 @@ class Maze():
         set_seed: int=None,
     ):
         self._cells = []
-        self.x1 = x1
-        self.y1 = y1
+        self.x1 = maze_x
+        self.y1 = maze_y
         self.num_rows = num_rows
         self.num_cols = num_cols
         self.cell_size = cell_size
@@ -112,15 +112,18 @@ class Maze():
                 self._break_walls_r(n, m)
         
 
-    def _animate(self, mode="draw"):
+    def _animate(self, mode=""):
         if self._win is None:
             return
         self._win.redraw()
 
         if mode == "solve":
-            sleep(MAZE_SOLVE_SPEED)
-        else:
-            sleep(MAZE_GENERATION_SPEED)
+            sleep_per_cell = MAZE_SOLVE_SPEED / (self.num_cols * self.num_rows)
+            limit = 1 / (self.num_cols * self.num_rows)
+            sleep(max(sleep_per_cell, limit))
+        elif mode == "draw cells":
+            sleep_per_cell = MAZE_GENERATION_SPEED / (self.num_cols * self.num_rows)
+            sleep(sleep_per_cell)
 
 
     def _draw_cell(self, i:int, j:int):
@@ -136,8 +139,8 @@ class Maze():
         #draw the Cell
         self._cells[i][j].draw(x1, y1, x2, y2)
 
-        #animate the maze
-        self._animate()
+        #animate the cell drawing
+        self._animate("draw cells")
     
 
     def _draw_line(self, i: int, j: int, n: int, m: int, undo=False):
