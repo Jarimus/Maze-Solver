@@ -1,6 +1,6 @@
 from cell import Cell
 from time import sleep
-from random import seed, randint
+from random import seed, randint, choice
 from constants import MAZE_GENERATION_SPEED, CORRECT_PATH_COLOR, WRONG_PATH_COLOR, MAZE_SOLVE_SPEED
 from line import Line
 from point import Point
@@ -26,6 +26,10 @@ class Maze():
         self._win = win
         self.seed = None if seed is None else seed(set_seed)
 
+        self.recursion_limit_reached = False
+        self.visited_cells = set()
+        self._cell_count = 0
+
         # Create the maze
         self._create_cells()
 
@@ -34,6 +38,13 @@ class Maze():
 
         # Create paths
         self._break_walls_r(0,0)
+        
+        print(f"visited: {len(self.visited_cells)}\ntotal: {self._cell_count}")
+        while len(self.visited_cells) < self._cell_count:
+            self.recursion_limit_reached = False
+            i, j = choice(list(self.visited_cells))
+            print("Starting new break at:", i, j)
+            self._break_walls_r(i, j)
 
         # Reset visited status
         self._reset_visited_cells()
@@ -47,6 +58,7 @@ class Maze():
             self._cells.append([])
             for j in range(self.num_rows):
                 self._cells[i].append(Cell(self._win))
+                self._cell_count += 1
         
         for i in range(self.num_cols):
             for j in range(self.num_rows):
@@ -65,23 +77,18 @@ class Maze():
         self._draw_cell(self.num_cols - 1, self.num_rows - 1)
     
     def _break_walls_r(self, i: int, j: int):
-        """Depth first recursion to break walls when initializing the maze.
-        Process:
-        1) Initiate in the entrance cell.
-        2) Mark the current Cell as visited.
-        3) List non-visited Cells to enter.
-        4) While list is non-empty, pick one Cell randomly from the list and pop it.
-        5) Break the wall to it.
-        6) Call recursively from that Cell.
-        7) Loop back to 4 until the list is empty.
-        8) Return
-        """
+        # Recursively break walls to form the maze. If recursion depth is reached, reset the stack.
+        # A new recursion will be started from one of the self.visited_cells until all the cells have been visited.
 
-        #2
+        if self.recursion_limit_reached:
+            return
+
+        #1 Mark current visited
         current_cell = self._cells[i][j]
         current_cell.visited = True
+        self.visited_cells.add((i,j))
 
-        #3 Create a list of potential paths
+        #2 Create a list of potential paths
         next_cells = []
         for (n, m) in [ (i,j+1), (i,j-1), (i-1,j), (i+1,j) ]:
             if not (0 <= n < self.num_cols and 0 <= m < self.num_rows):
@@ -89,8 +96,11 @@ class Maze():
             if not self._cells[n][m].visited:
                 next_cells.append( (n, m) )
     
-        #4 Choose one path randomly. Break, draw and enter recursively.
+        #3 Choose one path randomly. Break, draw and enter recursively.
         while next_cells != []:
+            if self.recursion_limit_reached:
+                return
+            
             n, m = next_cells.pop( randint(0, len(next_cells) - 1 ) )
             next_cell = self._cells[n][m]
             next_cell: Cell
@@ -107,10 +117,13 @@ class Maze():
                 elif m == j - 1:
                     current_cell.top_wall = False
                     next_cell.bottom_wall = False
-                
-                self._draw_cell(i, j)
-                self._break_walls_r(n, m)
-        
+    
+                try:
+                    self._draw_cell(i, j)
+                    self._break_walls_r(n, m)
+                except RecursionError:
+                    self.recursion_limit_reached = True
+                    break    
 
     def _animate(self, mode=""):
         if self._win is None:
@@ -165,6 +178,7 @@ class Maze():
 
     
     def _reset_visited_cells(self):
+        self.visited_cells = set()
         cell: Cell
         for row in self._cells:
             for cell in row:
@@ -172,40 +186,58 @@ class Maze():
     
     def solve(self):
         return self._solve_r(0, 0)
-
+    
     def _solve_r(self, i: int, j: int):
-        current_cell = self._cells[i][j]
-        current_cell.visited = True
 
-        if i == self.num_cols - 1 and j == self.num_rows - 1:
-            return True
-        
-        next_cells = [ (i,j+1), (i,j-1), (i-1,j), (i+1,j) ]
+        path = [] # a list recording the current path being traced. used to back track and mark as incorrect
 
-        while next_cells != []:
+        while True:
+            #visit the current cell
+            current_cell = self._cells[i][j]
+            current_cell.visited = True
 
-            n, m = next_cells.pop( randint(0, len(next_cells) - 1) )
+            # Stop if the exit has been reached.
+            if i == self.num_cols - 1 and j == self.num_rows - 1:
+                    break
 
-            if not (0 <= n < self.num_cols and 0 <= m < self.num_rows):
+            # adjacent cells are all the cells orthogonally adjacent to the current cell
+            adjacent_cells = [ (i,j+1), (i,j-1), (i-1,j), (i+1,j) ]
+            potential_cells = []
+
+            # Go through the adjacent cells, and pick only cells that
+            # 1) Are within the maze coordinates
+            # 2) Are not blocked by a wall
+            # 3) Are not visited
+            for next_cell in adjacent_cells:
+                n, m = next_cell
+                if not (0 <= n < self.num_cols and 0 <= m < self.num_rows):
+                    continue
+                elif n == i - 1 and current_cell.left_wall == True:
+                    continue
+                elif n == i + 1 and current_cell.right_wall == True:
+                    continue
+                elif m == j - 1 and current_cell.top_wall == True:
+                    continue
+                elif m == j + 1 and current_cell.bottom_wall == True:
+                    continue
+                elif self._cells[n][m].visited:
+                    continue
+                else:
+                    potential_cells.append( (n, m) )
+                
+            # If there were no new cells to visit, this is a dead-end.
+            # Backtrack to the previous cell, until there are potential cells.
+            if len(potential_cells) == 0:
+                i, j, n, m = path.pop()
+                self._draw_line(i, j, n, m, undo=True)
+                self._animate("solve")
                 continue
-            if not self._cells[n][m].visited:
-                path = False
-                if n == i - 1 and current_cell.left_wall == False:
-                    path = True
-                if n == i + 1 and current_cell.right_wall == False:
-                    path = True
-                if m == j - 1 and current_cell.top_wall == False:
-                    path = True
-                if m == j + 1 and current_cell.bottom_wall == False:
-                    path = True
-                if path:
-                    self._animate("solve")
-                    self._draw_line(i, j, n, m)
-                    correct_path = self._solve_r(n, m)
-                    if correct_path:
-                        return True
-                    if not correct_path:
-                        self._animate("solve")
-                        self._draw_line(i, j, n, m, undo=True)
-        
-        return False
+            # If there are potential cells, pick one to traverse to.
+            elif len(potential_cells) > 0:
+                n, m = choice(potential_cells)
+                path.append( (i, j, n, m) )
+                print("Drawing:", i, j, n, m)
+                self._draw_line( i, j, n, m )
+                self._animate("solve")
+                i, j = n, m
+                continue

@@ -40,12 +40,12 @@ class Window():
         self.solve_maze_btn.grid( column=2, row=0, columnspan=2, pady=ELEMENT_PADDING )
 
         # Labels and Entries for rows and columns
-        self.rows_label = Label(self.__tk, text=f"Rows (max {MAZE_ROWS}):", font=self.button_font)
+        self.rows_label = Label(self.__tk, text=f"Rows (Default {MAZE_ROWS}):", font=self.button_font)
         self.rows_label.grid(column=0, row=1, pady=ELEMENT_PADDING)
         self.rows_entry = Entry(self.__tk, font=self.button_font)
         self.rows_entry.grid(column=1, row=1, pady=ELEMENT_PADDING)
 
-        self.cols_label = Label(self.__tk, text=f"Columns(max {MAZE_COLS}):", font=self.button_font)
+        self.cols_label = Label(self.__tk, text=f"Columns(Default {MAZE_COLS}):", font=self.button_font)
         self.cols_label.grid(column=2, row=1, pady=ELEMENT_PADDING)
         self.cols_entry = Entry(self.__tk, font=self.button_font)
         self.cols_entry.grid(column=3, row=1, pady=ELEMENT_PADDING)
@@ -110,8 +110,8 @@ class Window():
 
         # Get rows and columns from entries
         try:
-            self.rows = min(MAZE_ROWS, int(self.rows_entry.get()) )
-            self.cols = min(MAZE_COLS, int(self.cols_entry.get()) )
+            self.rows = int(self.rows_entry.get())
+            self.cols = int(self.cols_entry.get())
         except ValueError:
             self.rows = MAZE_ROWS
             self.cols = MAZE_COLS

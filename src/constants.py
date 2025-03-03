@@ -9,10 +9,10 @@ CELL_SIZE = 0 # If set to zero, the cell size is set to fill the canvas.
 # Maze constants. Screen space is used most optimally when the cols/rows ratio is around 2:1.
 MAZE_V_PADDING = 50 # Vertical padding
 MAZE_H_PADDING = 50 # Horizontal padding
-MAZE_COLS = 20
-MAZE_ROWS = 10
-MAZE_GENERATION_SPEED = 1 # The delay between each draw when drawing the path in seconds
-MAZE_SOLVE_SPEED = 3 # How many seconds to solve the whole maze, visiting every cell
+MAZE_COLS = 35
+MAZE_ROWS = 15
+MAZE_GENERATION_SPEED = 2 # The delay between each draw when drawing the path in seconds
+MAZE_SOLVE_SPEED = 5 # How many seconds to solve the whole maze, visiting every cell
 RANDOM_SEED = None # Set to an int to generate the same mazes each time
 
 # Line constants
