@@ -128,7 +128,7 @@ class Maze():
             return
         self._win.redraw()
 
-        lower = 0.1 / (self.num_cols * self.num_rows)
+        lower = 0.001 / (self.num_cols * self.num_rows)
         upper = 20 / (self.num_cols * self.num_rows)
         if mode == "solve":
             sleep_per_cell = MAZE_SOLVE_SPEED / (self.num_cols * self.num_rows)

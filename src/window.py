@@ -1,6 +1,6 @@
 from tkinter import Tk, Button, Canvas, font, Entry, Label
 from line import Line
-from constants import BACKGROUND_COLOR, MAZE_V_PADDING, MAZE_H_PADDING, MAZE_COLS, MAZE_ROWS, CELL_SIZE, RANDOM_SEED, SPACE_FOR_UI, ELEMENT_PADDING
+from constants import BACKGROUND_COLOR, MAZE_V_PADDING, MAZE_H_PADDING, MAZE_COLS, MAZE_ROWS, CELL_SIZE, RANDOM_SEED, SPACE_FOR_UI, ELEMENT_PADDING, FONT_SIZE
 from maze import Maze
 
 
@@ -14,16 +14,16 @@ class Window():
         self.cell_size = CELL_SIZE
 
         # Font
-        self.button_font = font.Font(size=28)
+        self.button_font = font.Font(size=FONT_SIZE)
 
         # Window size
-        self.__tk.attributes("-fullscreen", True)
-
         if width == 0 or height == 0:
-            self.__width, self.__height = min(self.__tk.winfo_screenwidth(), 1920), min(self.__tk.winfo_screenheight(), 1080) 
+            self.__width, self.__height = self.__tk.winfo_screenwidth(), self.__tk.winfo_screenheight()
         else:
             self.__width = width
             self.__height = height
+        
+        self.__tk.attributes("-fullscreen", True)
         
         # Tk widget
         self.__tk.configure(background=BACKGROUND_COLOR)
@@ -88,13 +88,16 @@ class Window():
         # disable the buttons
         self.solve_maze_btn["state"] = "disabled"
         self.create_maze_btn["state"] = "disabled"
+        self.solve_maze_quickly_btn["state"] = "disabled"
+        self.exit_btn["state"] = "disabled"
         # Clear canvas
         self._canvas.delete("all")
 
 
         # Initiate the maze
         self.maze = Maze(self.maze_x, self.maze_y, self.rows, self.cols, self.cell_size, self, RANDOM_SEED)
-        # Reactivate the button, activate solve button
+        # Reactivate buttons
+
         self.create_maze_btn["state"] = "normal"
         self.solve_maze_btn["state"] = "normal"
         self.solve_maze_quickly_btn["state"] = "normal"
@@ -122,7 +125,7 @@ class Window():
         self._canvas = Canvas()
 
         #Get dimensions for the canvas
-        canvas_width = self.__width * 0.999
+        canvas_width = self.__width * 0.99
         canvas_height = self.__height - SPACE_FOR_UI
 
         # Get rows and columns from entries
