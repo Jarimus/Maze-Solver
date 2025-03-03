@@ -11,8 +11,11 @@ MAZE_V_PADDING = 50 # Vertical padding
 MAZE_H_PADDING = 50 # Horizontal padding
 MAZE_COLS = 22
 MAZE_ROWS = 10
-MAZE_GENERATION_SPEED = 3 # Seconds to generate all cells, generate all paths. Between 0.001-20
-MAZE_SOLVE_SPEED = 7 # Between 0.001-20
+
+# Maze speed constants. Seconds to draw a frame (draw a cell, draw a line)
+MAZE_SPEED_SLOW = 0.05
+MAZE_SPEED_NORMAL = 0.01
+MAZE_SPEED_FAST = 0.005
 RANDOM_SEED = None # Set to an int to generate the same mazes each time
 
 # Line constants
@@ -21,7 +24,7 @@ PATH_LINE_THICKNESS = 3
 
 # Widget constants
 ELEMENT_PADDING = 10
-FONT_SIZE = 16
+FONT_SIZE = 14
 
 # Color constants
 WALL_COLOR = "white"

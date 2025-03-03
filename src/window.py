@@ -9,6 +9,7 @@ class Window():
     def __init__(self, width, height):
         self.__tk = Tk()
         self._canvas = None
+        self.buttons = []
 
         # Customizable cell size from the constant value
         self.cell_size = CELL_SIZE
@@ -30,32 +31,42 @@ class Window():
         self.__tk.geometry(str(self.__width) + "x" + str(self.__height) + "+0+0")
         self.__tk.title = "Maze Solver"
 
+        # 'Maze speed' button
+        self.speed = "normal"
+        self.speed_btn = Button(self.__tk, text=f"Speed: {self.speed}", command=self.set_speed, font=self.button_font)
+        self.speed_btn.grid( column=0, row=0, pady=ELEMENT_PADDING)
+        self.buttons.append(self.speed_btn)
+
         # 'Create Maze' button
         self.create_maze_btn = Button(self.__tk, text="Create a maze", command=self.start_maze, font=self.button_font)
-        self.create_maze_btn.grid( column=0, row=0, pady=ELEMENT_PADDING )
+        self.create_maze_btn.grid( column=1, row=0, pady=ELEMENT_PADDING )
+        self.buttons.append(self.create_maze_btn)
 
         # 'Solve Maze' button
-        self.solve_maze_btn = Button(self.__tk, text="Solve", state="disabled", command=self.solve_maze("normal"), font=self.button_font)
-        self.solve_maze_btn.grid( column=1, row=0, pady=ELEMENT_PADDING )
+        self.solve_maze_btn = Button(self.__tk, text="Solve (random path)", state="disabled", command=self.solve_maze("random"), font=self.button_font)
+        self.solve_maze_btn.grid( column=2, row=0, pady=ELEMENT_PADDING )
+        self.buttons.append(self.solve_maze_btn)
 
-        # 'Solve Maze Quickly' button
-        self.solve_maze_quickly_btn = Button(self.__tk, text="Solve (only correct path)", state="disabled", command=self.solve_maze("quickly"), font=self.button_font)
-        self.solve_maze_quickly_btn.grid( column=2, row=0, pady=ELEMENT_PADDING )
+        # 'Solve with Correct Path' button
+        self.solve_maze_direct_btn = Button(self.__tk, text="Solve (correct path)", state="disabled", command=self.solve_maze("direct"), font=self.button_font)
+        self.solve_maze_direct_btn.grid( column=3, row=0, pady=ELEMENT_PADDING )
+        self.buttons.append(self.solve_maze_direct_btn)
 
         # 'Exit' button
         self.exit_btn = Button(self.__tk, text="Exit", state="normal", command=self.close, font=self.button_font)
-        self.exit_btn.grid( column=3, row=0, pady=ELEMENT_PADDING )
+        self.exit_btn.grid( column=4, columnspan=2, row=0, pady=ELEMENT_PADDING )
+        self.buttons.append(self.exit_btn)
 
         # Labels and Entries for rows and columns
         self.rows_label = Label(self.__tk, text=f"Rows (Default {MAZE_ROWS}):", font=self.button_font)
-        self.rows_label.grid(column=0, row=1, pady=ELEMENT_PADDING)
+        self.rows_label.grid(column=0, columnspan=2, row=1, pady=ELEMENT_PADDING)
         self.rows_entry = Entry(self.__tk, font=self.button_font)
-        self.rows_entry.grid(column=1, row=1, pady=ELEMENT_PADDING)
+        self.rows_entry.grid(column=2, row=1, pady=ELEMENT_PADDING)
 
         self.cols_label = Label(self.__tk, text=f"Columns(Default {MAZE_COLS}):", font=self.button_font)
-        self.cols_label.grid(column=2, row=1, pady=ELEMENT_PADDING)
+        self.cols_label.grid(column=3, columnspan=2, row=1, pady=ELEMENT_PADDING)
         self.cols_entry = Entry(self.__tk, font=self.button_font)
-        self.cols_entry.grid(column=3, row=1, pady=ELEMENT_PADDING)
+        self.cols_entry.grid(column=5, row=1, pady=ELEMENT_PADDING)
 
         # Create canvas
         self.create_canvas()
@@ -82,40 +93,49 @@ class Window():
     def draw_line(self, line: Line, fill_color: str):
         line.draw(self._canvas, fill_color)
 
+    def set_speed(self):
+        match self.speed:
+            case "normal":
+                self.speed = "fast"
+            case "fast":
+                self.speed = "instant"
+            case "instant":
+                self.speed = "slow"
+            case "slow":
+                self.speed = "normal"
+        self.speed_btn.config(text=f"Speed: {self.speed}")
+
     def start_maze(self):
         self.create_canvas()
 
         # disable the buttons
-        self.solve_maze_btn["state"] = "disabled"
-        self.create_maze_btn["state"] = "disabled"
-        self.solve_maze_quickly_btn["state"] = "disabled"
-        self.exit_btn["state"] = "disabled"
+        for btn in self.buttons:
+            btn["state"] = "disabled"
         # Clear canvas
         self._canvas.delete("all")
 
 
         # Initiate the maze
-        self.maze = Maze(self.maze_x, self.maze_y, self.rows, self.cols, self.cell_size, self, RANDOM_SEED)
+        self.maze = Maze(self.maze_x, self.maze_y, self.rows, self.cols, self.cell_size, self, RANDOM_SEED, self.speed)
         # Reactivate buttons
-
-        self.create_maze_btn["state"] = "normal"
-        self.solve_maze_btn["state"] = "normal"
-        self.solve_maze_quickly_btn["state"] = "normal"
-        self.exit_btn["state"] = "normal"
+        for btn in self.buttons:
+            btn["state"] = "normal"
 
     
-    def solve_maze(self, style="normal"):
+    def solve_maze(self, style="random"):
         def solve():
+            # disable the buttons
+            for btn in self.buttons:
+                btn["state"] = "disabled"
+            if style == "direct":
+                self.maze._solve_r_direct(self.speed)
+            elif style == "random":
+                self.maze._solve_r(self.speed)
+            # enable the buttons
+            for btn in self.buttons:
+                btn["state"] = "normal"
             self.solve_maze_btn["state"] = "disabled"
-            self.solve_maze_quickly_btn["state"] = "disabled"
-            self.create_maze_btn["state"] = "disabled"
-            self.exit_btn["state"] = "disabled"
-            if style == "quickly":
-                self.maze._solve_r_quickly()
-            elif style == "normal":
-                self.maze.solve()
-            self.create_maze_btn["state"] = "normal"
-            self.exit_btn["state"] = "normal"
+            self.solve_maze_direct_btn["state"] = "disabled"
         return solve
 
     def create_canvas(self):
@@ -136,12 +156,11 @@ class Window():
             self.rows = MAZE_ROWS
             self.cols = MAZE_COLS
 
-        #Apply UI
-        self._canvas.config( width=canvas_width, height=canvas_height, bg=BACKGROUND_COLOR)
-        self._canvas.grid( column=0, columnspan=4,row=2 )
+        # Apply UI
+        self._canvas.config( width=canvas_width, height=canvas_height, bg=BACKGROUND_COLOR )
+        self._canvas.grid( column=0, columnspan=6,row=2 )
 
-        # If CELL_SIZE == 0, the canvas' size is calculated to fill the screen with a CELL_SIZE that fills the canvas.
-        #if self.cell_size == 0:
+        # Count cell_size to fill the canvas with the maze
         self.cell_size = min( (canvas_width - MAZE_H_PADDING) // self.cols, (canvas_height - MAZE_V_PADDING) // self.rows )
 
         # Adjust maze to the center of the canvas

@@ -1,7 +1,7 @@
 from cell import Cell
 from time import sleep
 from random import seed, randint, choice
-from constants import MAZE_GENERATION_SPEED, CORRECT_PATH_COLOR, WRONG_PATH_COLOR, MAZE_SOLVE_SPEED
+from constants import CORRECT_PATH_COLOR, WRONG_PATH_COLOR, MAZE_SPEED_SLOW, MAZE_SPEED_NORMAL, MAZE_SPEED_FAST
 from line import Line
 from point import Point
 
@@ -16,6 +16,7 @@ class Maze():
         cell_size,
         win =None,
         set_seed: int=None,
+        speed: str="normal"
     ):
         self._cells = []
         self.x1 = maze_x
@@ -25,6 +26,7 @@ class Maze():
         self.cell_size = cell_size
         self._win = win
         self.seed = None if seed is None else seed(set_seed)
+        self.speed = speed
 
         self.recursion_limit_reached = False
         self.visited_cells = set()
@@ -123,21 +125,20 @@ class Maze():
                     self.recursion_limit_reached = True
                     break    
 
-    def _animate(self, mode=""):
+    def _animate(self):
         if self._win is None:
             return
         self._win.redraw()
 
-        lower = 0.001 / (self.num_cols * self.num_rows)
-        upper = 20 / (self.num_cols * self.num_rows)
-        if mode == "solve":
-            sleep_per_cell = MAZE_SOLVE_SPEED / (self.num_cols * self.num_rows)
-            sleep(min(max(sleep_per_cell, lower),upper))
-        elif mode == "draw cells":
-            sleep_per_cell = MAZE_GENERATION_SPEED / (self.num_cols * self.num_rows)
-            sleep(min(max(sleep_per_cell, lower),upper))
-        elif mode == "very slow":
-            sleep(0.1)
+        match self.speed:
+            case "slow":
+                sleep(MAZE_SPEED_SLOW)
+            case "normal":
+                sleep(MAZE_SPEED_NORMAL)
+            case "fast":
+                sleep(MAZE_SPEED_FAST)
+            case "instant":
+                return
 
 
     def _draw_cell(self, i:int, j:int):
@@ -154,7 +155,7 @@ class Maze():
         self._cells[i][j].draw(x1, y1, x2, y2)
 
         #animate the cell drawing
-        self._animate("draw cells")
+        self._animate()
     
 
     def _draw_line(self, i: int, j: int, n: int, m: int, undo=False):
@@ -185,12 +186,9 @@ class Maze():
             for cell in row:
                 cell.visited = False
     
-    def solve(self):
-        return self._solve_r()
-    
-    def _solve_r(self, start_i: int=0, start_j: int=0):
-
-        i, j = start_i, start_j
+    def _solve_r(self, speed):
+        self.speed = speed
+        i, j = 0, 0
         path = [] # a list recording the current path being traced. used to back track and mark as incorrect
 
         while True:
@@ -232,20 +230,22 @@ class Maze():
             if len(potential_cells) == 0:
                 i, j, n, m = path.pop()
                 self._draw_line(i, j, n, m, undo=True)
-                self._animate("solve")
+                self._animate()
                 continue
             # If there are potential cells, pick one to traverse to.
             elif len(potential_cells) > 0:
                 n, m = choice(potential_cells)
                 path.append( (i, j, n, m) )
                 self._draw_line( i, j, n, m )
-                self._animate("solve")
+                self._animate()
                 i, j = n, m
                 continue
 
-    def _solve_r_quickly(self, i: int=0, j: int=0):
+    def _solve_r_direct(self, speed: str):
+        self.speed = speed
 
         path = [] # a list recording the current path being traced. used to back track and mark as incorrect
+        i, j = 0, 0
 
         while True:
             #visit the current cell
@@ -297,4 +297,4 @@ class Maze():
         while path != []:
             i, j, n, m = path.pop()
             self._draw_line(i, j, n, m)
-            self._animate("very slow")
+            self._animate()
