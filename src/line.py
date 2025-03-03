@@ -11,7 +11,7 @@ class Line():
     
     def draw(self, canvas: Canvas, fill_color: str):
         """Draws a line from point1 to point2 on the canvas."""
-        if fill_color in [WALL_COLOR, BACKGROUND_COLOR]:
-            canvas.create_line(self.point1.x, self.point1.y, self.point2.x, self.point2.y, fill=fill_color, width=WALL_LINE_THICKNESS)
-        elif fill_color in [CORRECT_PATH_COLOR, WRONG_PATH_COLOR]:
+        if fill_color in [CORRECT_PATH_COLOR, WRONG_PATH_COLOR]:
             canvas.create_line(self.point1.x, self.point1.y, self.point2.x, self.point2.y, fill=fill_color, width=PATH_LINE_THICKNESS)
+        elif fill_color in [WALL_COLOR, BACKGROUND_COLOR]:
+            canvas.create_line(self.point1.x, self.point1.y, self.point2.x, self.point2.y, fill=fill_color, width=WALL_LINE_THICKNESS)

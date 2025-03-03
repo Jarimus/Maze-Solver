@@ -17,10 +17,10 @@ class Window():
         self.button_font = font.Font(size=28)
 
         # Window size
-        if width == 0 and height == 0:
-            new_width, new_height = self.__tk.winfo_screenwidth() - 10, self.__tk.winfo_screenheight() - 10
-            self.__width = new_width
-            self.__height = new_height
+        self.__tk.attributes("-fullscreen", True)
+
+        if width == 0 or height == 0:
+            self.__width, self.__height = min(self.__tk.winfo_screenwidth(), 1920), min(self.__tk.winfo_screenheight(), 1080) 
         else:
             self.__width = width
             self.__height = height
@@ -32,12 +32,19 @@ class Window():
 
         # 'Create Maze' button
         self.create_maze_btn = Button(self.__tk, text="Create a maze", command=self.start_maze, font=self.button_font)
-        self.create_maze_btn.grid( column=0, row=0, columnspan=2, pady=ELEMENT_PADDING )
-        
+        self.create_maze_btn.grid( column=0, row=0, pady=ELEMENT_PADDING )
 
         # 'Solve Maze' button
-        self.solve_maze_btn = Button(self.__tk, text="Solve the maze", state="disabled", command=self.solve_maze, font=self.button_font)
-        self.solve_maze_btn.grid( column=2, row=0, columnspan=2, pady=ELEMENT_PADDING )
+        self.solve_maze_btn = Button(self.__tk, text="Solve", state="disabled", command=self.solve_maze("normal"), font=self.button_font)
+        self.solve_maze_btn.grid( column=1, row=0, pady=ELEMENT_PADDING )
+
+        # 'Solve Maze Quickly' button
+        self.solve_maze_quickly_btn = Button(self.__tk, text="Solve (only correct path)", state="disabled", command=self.solve_maze("quickly"), font=self.button_font)
+        self.solve_maze_quickly_btn.grid( column=2, row=0, pady=ELEMENT_PADDING )
+
+        # 'Exit' button
+        self.exit_btn = Button(self.__tk, text="Exit", state="normal", command=self.close, font=self.button_font)
+        self.exit_btn.grid( column=3, row=0, pady=ELEMENT_PADDING )
 
         # Labels and Entries for rows and columns
         self.rows_label = Label(self.__tk, text=f"Rows (Default {MAZE_ROWS}):", font=self.button_font)
@@ -90,13 +97,23 @@ class Window():
         # Reactivate the button, activate solve button
         self.create_maze_btn["state"] = "normal"
         self.solve_maze_btn["state"] = "normal"
+        self.solve_maze_quickly_btn["state"] = "normal"
+        self.exit_btn["state"] = "normal"
 
     
-    def solve_maze(self):
-        self.solve_maze_btn["state"] = "disabled"
-        self.create_maze_btn["state"] = "disabled"
-        self.maze.solve()
-        self.create_maze_btn["state"] = "normal"
+    def solve_maze(self, style="normal"):
+        def solve():
+            self.solve_maze_btn["state"] = "disabled"
+            self.solve_maze_quickly_btn["state"] = "disabled"
+            self.create_maze_btn["state"] = "disabled"
+            self.exit_btn["state"] = "disabled"
+            if style == "quickly":
+                self.maze._solve_r_quickly()
+            elif style == "normal":
+                self.maze.solve()
+            self.create_maze_btn["state"] = "normal"
+            self.exit_btn["state"] = "normal"
+        return solve
 
     def create_canvas(self):
         # canvas
@@ -105,7 +122,7 @@ class Window():
         self._canvas = Canvas()
 
         #Get dimensions for the canvas
-        canvas_width = self.__width
+        canvas_width = self.__width * 0.999
         canvas_height = self.__height - SPACE_FOR_UI
 
         # Get rows and columns from entries
