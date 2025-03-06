@@ -1,6 +1,6 @@
 from tkinter import Tk, Button, Canvas, font, Entry, Label
 from line import Line
-from constants import BACKGROUND_COLOR, MAZE_V_PADDING, MAZE_H_PADDING, MAZE_COLS, MAZE_ROWS, CELL_SIZE, RANDOM_SEED, SPACE_FOR_UI, ELEMENT_PADDING, FONT_SIZE
+from constants import BACKGROUND_COLOR, MAZE_V_PADDING, MAZE_H_PADDING, MAZE_COLS, MAZE_ROWS, RANDOM_SEED, SPACE_FOR_UI, ELEMENT_PADDING, FONT_SIZE
 from maze import Maze
 
 
@@ -10,9 +10,6 @@ class Window():
         self.__tk = Tk()
         self._canvas = None
         self.buttons = []
-
-        # Customizable cell size from the constant value
-        self.cell_size = CELL_SIZE
 
         # Font
         self.button_font = font.Font(size=FONT_SIZE)

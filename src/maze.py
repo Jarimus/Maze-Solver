@@ -1,7 +1,10 @@
 from cell import Cell
 from time import sleep
 from random import seed, randint, choice
-from constants import CORRECT_PATH_COLOR, WRONG_PATH_COLOR, MAZE_SPEED_SLOW, MAZE_SPEED_NORMAL, MAZE_SPEED_FAST
+from constants import (CORRECT_PATH_COLOR, WRONG_PATH_COLOR,
+                       MAZE_SPEED_SLOW, MAZE_SPEED_NORMAL,
+                       MAZE_SPEED_FAST, MAZE_EXIT_X, MAZE_EXIT_Y
+                       )
 from line import Line
 from point import Point
 
@@ -32,14 +35,29 @@ class Maze():
         self.visited_cells = set()
         self._cell_count = 0
 
+        # Exit coordinates
+        if MAZE_EXIT_X == 0 and MAZE_EXIT_Y == 0:
+            self.exit_i = self.num_cols - 1
+            self.exit_j = self.num_rows - 1
+        elif MAZE_EXIT_X == -1 and MAZE_EXIT_Y == -1:
+            self.exit_i = randint(0, self.num_cols - 1)
+            self.exit_j = randint(0, self.num_rows - 1)
+        else:
+            try:
+                self.exit_i = MAZE_EXIT_X
+                self.exit_j = MAZE_EXIT_Y
+            except ValueError:
+                self.exit_i = self.num_cols - 1
+                self.exit_j = self.num_rows - 1
+
         # Create the maze
         self._create_cells()
 
-        # break entrance and exit
-        self._break_entrance_and_exit()
-
         # Create paths
         self._break_walls_r(0,0)
+
+        # break entrance and exit
+        self._break_entrance_and_exit()
         
         while len(self.visited_cells) < self._cell_count:
             self.recursion_limit_reached = False
@@ -63,7 +81,7 @@ class Maze():
         for i in range(self.num_cols):
             for j in range(self.num_rows):
                 self._draw_cell(i, j)
-    
+            
     def _break_entrance_and_exit(self):
         self._cells: list[list[Cell]]
 
@@ -72,9 +90,10 @@ class Maze():
         self._draw_cell(0, 0)
 
         #exit
-        exit = self._cells[self.num_cols - 1][self.num_rows - 1]
-        exit.bottom_wall = False
-        self._draw_cell(self.num_cols - 1, self.num_rows - 1)
+        self._draw_exit()
+        #exit = self._cells[self.num_cols - 1][self.num_rows - 1]
+        #exit.bottom_wall = False
+        #self._draw_cell(self.num_cols - 1, self.num_rows - 1)
     
     def _break_walls_r(self, i: int, j: int):
         # Recursively break walls to form the maze. If recursion depth is reached, reset the stack.
@@ -177,7 +196,10 @@ class Maze():
 
         new_line = Line( Point(x1, y1), Point(x2, y2) )
         self._win.draw_line( new_line, fill_color)
-
+    
+    def _draw_exit(self):
+        exit_cell = self._cells[self.exit_i][self.exit_j]
+        exit_cell.draw_exit()
     
     def _reset_visited_cells(self):
         self.visited_cells = set()
@@ -197,8 +219,8 @@ class Maze():
             current_cell.visited = True
 
             # Stop if the exit has been reached.
-            if i == self.num_cols - 1 and j == self.num_rows - 1:
-                    break
+            if i == self.exit_i and j == self.exit_j:
+                break
 
             # adjacent cells are all the cells orthogonally adjacent to the current cell
             adjacent_cells = [ (i,j+1), (i,j-1), (i-1,j), (i+1,j) ]
@@ -253,8 +275,8 @@ class Maze():
             current_cell.visited = True
 
             # Stop if the exit has been reached.
-            if i == self.num_cols - 1 and j == self.num_rows - 1:
-                    break
+            if i == self.exit_i and j == self.exit_j:
+                break
 
             # adjacent cells are all the cells orthogonally adjacent to the current cell
             adjacent_cells = [ (i,j+1), (i,j-1), (i-1,j), (i+1,j) ]

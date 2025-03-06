@@ -1,6 +1,6 @@
 from point import Point
 from line import Line
-from constants import WALL_COLOR, BACKGROUND_COLOR, CORRECT_PATH_COLOR, WRONG_PATH_COLOR
+from constants import WALL_COLOR, BACKGROUND_COLOR, CORRECT_PATH_COLOR, WRONG_PATH_COLOR, EXIT_COLOR
 
 class Cell():
     """A class for the individual cells in the maze"""
@@ -15,7 +15,7 @@ class Cell():
         self.bottom_wall = True
         self.left_wall = True
         self.right_wall = True
-        self.win = win
+        self._win = win
         self.visited = False
     
     def draw(self, x1, y1, x2, y2):
@@ -57,13 +57,28 @@ class Cell():
 
         line: Line
         for line in lines:
-            self.win.draw_line(line, WALL_COLOR)
+            self._win.draw_line(line, WALL_COLOR)
         for line in passage:
-            self.win.draw_line(line, BACKGROUND_COLOR)
+            self._win.draw_line(line, BACKGROUND_COLOR)
     
     def draw_move(self, other_cell: "Cell", undo=False):
         center_self = Point( (self._x1 + self._x2) / 2, (self._y1 + self._y2) / 2)
         center_other = Point( (other_cell._x1 + other_cell._x2) / 2, (other_cell._y1 + other_cell._y2) / 2)
         line = Line( center_self, center_other )
         color = CORRECT_PATH_COLOR if not undo else WRONG_PATH_COLOR
-        self.win.draw_line( line, fill_color=color)
+        self._win.draw_line( line, fill_color=color)
+    
+    def draw_exit(self):
+
+        top_left = Point(self._x1, self._y1)
+        top_right = Point(self._x2, self._y1)
+        bottom_left = Point(self._x1, self._y2)
+        bottom_right = Point(self._x2, self._y2)
+
+        lines = [
+            Line(top_left, bottom_right),
+            Line(top_right, bottom_left)
+        ]
+
+        for line in lines:
+            self._win.draw_line( line, EXIT_COLOR)

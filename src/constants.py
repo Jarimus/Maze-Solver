@@ -3,18 +3,19 @@ SCREEN_WIDTH = 0
 SCREEN_HEIGHT = 0
 SPACE_FOR_UI = 150
 
-# Cell constants
-CELL_SIZE = 0 # If set to zero, the cell size is set to fill the canvas.
-
 # Maze constants. Screen space is used most optimally when the cols/rows ratio is around 2:1.
-MAZE_V_PADDING = 50 # Vertical padding
-MAZE_H_PADDING = 50 # Horizontal padding
-MAZE_COLS = 22
+MAZE_V_PADDING = 20 # Vertical padding
+MAZE_H_PADDING = 20 # Horizontal padding
+MAZE_COLS = 25
 MAZE_ROWS = 10
 
+#Set both to -1 for random exit location. Set both to 0 for bottom-right exit.
+MAZE_EXIT_X = -1 # Should be between 0--(MAZE_COLS-1)
+MAZE_EXIT_Y = -1 # Between 0--(MAZE_ROWS-1)
+
 # Maze speed constants. Seconds to draw a frame (draw a cell, draw a line)
-MAZE_SPEED_SLOW = 0.05
-MAZE_SPEED_NORMAL = 0.01
+MAZE_SPEED_SLOW = 0.1
+MAZE_SPEED_NORMAL = 0.025
 MAZE_SPEED_FAST = 0.005
 RANDOM_SEED = None # Set to an int to generate the same mazes each time
 
@@ -30,4 +31,5 @@ FONT_SIZE = 14
 WALL_COLOR = "white"
 BACKGROUND_COLOR = "black"
 CORRECT_PATH_COLOR = "green"
-WRONG_PATH_COLOR = "red" # default 'red'. Set to background color to 'erase' the incorrect paths
+WRONG_PATH_COLOR = "black" # default 'red'. Set to background color to 'erase' the incorrect paths
+EXIT_COLOR = "yellow"
