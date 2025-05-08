@@ -19,7 +19,8 @@ class Maze():
         cell_size,
         win =None,
         set_seed: int=None,
-        speed: str="normal"
+        speed: str="normal",
+        exit: str="set"
     ):
         self._cells = []
         self.x1 = maze_x
@@ -30,25 +31,34 @@ class Maze():
         self._win = win
         self.seed = None if seed is None else seed(set_seed)
         self.speed = speed
+        self.exit = exit
 
         self.recursion_limit_reached = False
         self.visited_cells = set()
         self._cell_count = 0
 
         # Exit coordinates
-        if MAZE_EXIT_X == 0 and MAZE_EXIT_Y == 0:
-            self.exit_i = self.num_cols - 1
-            self.exit_j = self.num_rows - 1
-        elif MAZE_EXIT_X == -1 and MAZE_EXIT_Y == -1:
-            self.exit_i = randint(0, self.num_cols - 1)
-            self.exit_j = randint(0, self.num_rows - 1)
-        else:
-            try:
-                self.exit_i = MAZE_EXIT_X
-                self.exit_j = MAZE_EXIT_Y
-            except ValueError:
+        match self.exit:
+            case "set":
                 self.exit_i = self.num_cols - 1
                 self.exit_j = self.num_rows - 1
+            case "random":
+                self.exit_i = randint(0, self.num_cols - 1)
+                self.exit_j = randint(0, self.num_rows - 1)
+
+        # if MAZE_EXIT_X == 0 and MAZE_EXIT_Y == 0:
+        #     self.exit_i = self.num_cols - 1
+        #     self.exit_j = self.num_rows - 1
+        # elif MAZE_EXIT_X == -1 and MAZE_EXIT_Y == -1:
+        #     self.exit_i = randint(0, self.num_cols - 1)
+        #     self.exit_j = randint(0, self.num_rows - 1)
+        # else:
+        #     try:
+        #         self.exit_i = MAZE_EXIT_X
+        #         self.exit_j = MAZE_EXIT_Y
+        #     except ValueError:
+        #         self.exit_i = self.num_cols - 1
+        #         self.exit_j = self.num_rows - 1
 
         # Create the maze
         self._create_cells()

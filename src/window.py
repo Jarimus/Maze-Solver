@@ -49,9 +49,15 @@ class Window():
         self.solve_maze_direct_btn.grid( column=3, row=0, pady=ELEMENT_PADDING )
         self.buttons.append(self.solve_maze_direct_btn)
 
-        # 'Exit' button
+        # 'Exit location' button
+        self.exit = "set"
+        self.maze_exit_btn = Button(self.__tk, text="Exit location: set", state="normal", command=self.set_maze_exit, font=self.button_font)
+        self.maze_exit_btn.grid( column=4, columnspan=1, row=0, pady=ELEMENT_PADDING )
+        self.buttons.append(self.maze_exit_btn)
+
+        # 'Exit program' button
         self.exit_btn = Button(self.__tk, text="Exit", state="normal", command=self.close, font=self.button_font)
-        self.exit_btn.grid( column=4, columnspan=2, row=0, pady=ELEMENT_PADDING )
+        self.exit_btn.grid( column=5, columnspan=1, row=0, pady=ELEMENT_PADDING )
         self.buttons.append(self.exit_btn)
 
         # Labels and Entries for rows and columns
@@ -101,6 +107,14 @@ class Window():
             case "slow":
                 self.speed = "normal"
         self.speed_btn.config(text=f"Speed: {self.speed}")
+    
+    def set_maze_exit(self):
+        match self.exit:
+            case "random":
+                self.exit = "set"
+            case "set":
+                self.exit = "random"
+        self.maze_exit_btn.config(text=f"Exit location: {self.exit}")
 
     def start_maze(self):
         self.create_canvas()
@@ -113,7 +127,7 @@ class Window():
 
 
         # Initiate the maze
-        self.maze = Maze(self.maze_x, self.maze_y, self.rows, self.cols, self.cell_size, self, RANDOM_SEED, self.speed)
+        self.maze = Maze(self.maze_x, self.maze_y, self.rows, self.cols, self.cell_size, self, RANDOM_SEED, self.speed, self.exit)
         # Reactivate buttons
         for btn in self.buttons:
             btn["state"] = "normal"
