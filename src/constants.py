@@ -9,10 +9,6 @@ MAZE_H_PADDING = 20 # Horizontal padding
 MAZE_COLS = 25
 MAZE_ROWS = 10
 
-#Set both to -1 for random exit location. Set both to 0 for bottom-right exit.
-MAZE_EXIT_X = 0 # Should be between 0--(MAZE_COLS-1)
-MAZE_EXIT_Y = 0 # Between 0--(MAZE_ROWS-1)
-
 # Maze speed constants. Seconds to draw a frame (draw a cell, draw a line)
 MAZE_SPEED_SLOW = 0.1
 MAZE_SPEED_NORMAL = 0.025

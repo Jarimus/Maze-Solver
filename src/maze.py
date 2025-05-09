@@ -3,7 +3,7 @@ from time import sleep
 from random import seed, randint, choice
 from constants import (CORRECT_PATH_COLOR, WRONG_PATH_COLOR,
                        MAZE_SPEED_SLOW, MAZE_SPEED_NORMAL,
-                       MAZE_SPEED_FAST, MAZE_EXIT_X, MAZE_EXIT_Y
+                       MAZE_SPEED_FAST
                        )
 from line import Line
 from point import Point
@@ -46,20 +46,6 @@ class Maze():
                 self.exit_i = randint(0, self.num_cols - 1)
                 self.exit_j = randint(0, self.num_rows - 1)
 
-        # if MAZE_EXIT_X == 0 and MAZE_EXIT_Y == 0:
-        #     self.exit_i = self.num_cols - 1
-        #     self.exit_j = self.num_rows - 1
-        # elif MAZE_EXIT_X == -1 and MAZE_EXIT_Y == -1:
-        #     self.exit_i = randint(0, self.num_cols - 1)
-        #     self.exit_j = randint(0, self.num_rows - 1)
-        # else:
-        #     try:
-        #         self.exit_i = MAZE_EXIT_X
-        #         self.exit_j = MAZE_EXIT_Y
-        #     except ValueError:
-        #         self.exit_i = self.num_cols - 1
-        #         self.exit_j = self.num_rows - 1
-
         # Create the maze
         self._create_cells()
 
@@ -100,10 +86,19 @@ class Maze():
         self._draw_cell(0, 0)
 
         #exit
-        self._draw_exit()
-        #exit = self._cells[self.num_cols - 1][self.num_rows - 1]
-        #exit.bottom_wall = False
-        #self._draw_cell(self.num_cols - 1, self.num_rows - 1)
+        exit = self._cells[self.exit_i][self.exit_j]
+        if self.exit_j == 0:
+            exit.top_wall = False
+        elif self.exit_j == self.num_rows - 1:
+            exit.bottom_wall = False
+        elif self.exit_i == 0:
+            exit.left_wall = False
+        elif self.exit_i == self.num_cols - 1:
+            exit.right_wall = False
+        else:
+            self._draw_exit()
+            return
+        self._draw_cell(self.exit_i, self.exit_j)
     
     def _break_walls_r(self, i: int, j: int):
         # Recursively break walls to form the maze. If recursion depth is reached, reset the stack.
